@@ -1,8 +1,36 @@
 # Goal of file:
 # Preform comparison of kanji in collection and list of kanji.
-# Store information on kanji occurance in collection.
+# Store information on kanji occurrence in collection.
 
-class kanji_stats():
+import unicodedata
+
+def isKanji(unichar):
+    try:
+        return unicodedata.name(unichar).find('CJK UNIFIED IDEOGRAPH') >= 0
+    except ValueError:
+        # a control character
+        return False
+
+class kanji_stats(object):
+
+    def __int__(self, col):
+        self.col = col
+
+    def get_hash(self, lst):
+        self._kanjiHash = dict()
+        for (name, chars), grade in zip(self.kanjiGrades, range(len(self.kanjiGrades))):
+            for c in chars:
+                self._kanjiHash[c] = [grade, self.occurrence(c, lst)]
+
+        return self._kanjiHash
+
+    def occurrence(self, unichar, lst):
+        # finds the number of occurrences of a character in list
+        return lst.count(unichar)
+
+    def get_occurrence(self, unichar):
+        return self._kanjiHash.get(unichar, 0)
+
 
     kanjiGrades = [
         (u'non-jouyou',
@@ -28,3 +56,10 @@ class kanji_stats():
         (u'Jinmeiyou (variant)',
          u'亞惡爲衞谒緣應櫻奧橫溫價祸壞懷樂渴卷陷寬氣僞戲虛峽狹曉勳薰惠揭鷄藝擊縣儉劍險圈檢顯驗嚴廣恆黃國黑碎雜兒濕壽收從澁獸縱緖敍將涉燒獎條狀乘淨剩疊孃讓釀眞寢愼盡粹醉穗瀨齊靜攝專戰纖禪壯爭莊搜巢裝騷增藏臟卽帶滯單團彈晝鑄廳徵聽鎭轉傳燈盜稻德拜賣髮拔晚祕拂佛步飜每默藥與搖樣謠來賴覽龍綠淚壘曆歷鍊郞錄')
     ]
+
+lst = '喜器希旗機季紀議救求泣求泣'
+s = kanji_stats()
+kanji_dict = s.get_hash(lst)
+print(kanji_dict['求']) # 4, 2
+print(kanji_dict['機']) # 4, 1
+print(kanji_dict['祸']) # 10, 0
